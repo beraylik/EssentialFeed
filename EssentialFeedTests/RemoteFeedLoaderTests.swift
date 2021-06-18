@@ -80,16 +80,13 @@ class RemoteFeedLoaderTests: XCTestCase {
         
         let item1 = makeItem(
             id: UUID(),
-            imageURL: URL(string: "http://a-url.com")!
-        )
+            imageURL: URL(string: "http://a-url.com")!)
         
         let item2 = makeItem(
             id: UUID(),
             description: "a description",
             location: "a location",
-            imageURL: URL(string: "http://a-url.com")!
-        )
- 
+            imageURL: URL(string: "http://a-url.com")!)
         
         let items = [item1.model, item2.model]
         
@@ -97,6 +94,20 @@ class RemoteFeedLoaderTests: XCTestCase {
             let json = makeItemsJSON([item1.json, item2.json])
             client.complete(withStatusCode: 200, data: json)
         }
+    }
+    
+    func test_load_doesNotDeliversResultAfterSUTInstanceHasBeenDeallocated() {
+        let url = URL(string: "https://any-url.com")!
+        let client =  HTTPClientSpy()
+        var sut: RemoteFeedLoader? = RemoteFeedLoader(url: url, client: client)
+        
+        var capturedResults = [RemoteFeedLoader.Result]()
+        sut?.load { capturedResults.append($0) }
+        
+        sut = nil
+        client.complete(withStatusCode: 200, data: makeItemsJSON([]))
+        
+        XCTAssertTrue(capturedResults.isEmpty)
     }
     
     // MARK: - Helpers
