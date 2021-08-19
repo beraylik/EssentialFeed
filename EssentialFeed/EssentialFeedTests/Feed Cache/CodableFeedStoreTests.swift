@@ -9,12 +9,71 @@ import XCTest
 import EssentialFeed
 
 class CodableFeedStore {
+    
+    private struct Cache: Codable {
+        let feed: [CodableFeedImage]
+        let timestamp: Date
+        
+        var localFeed: [LocalFeedImage] {
+            return feed.map { $0.local }
+        }
+    }
+    
+    private struct CodableFeedImage: Codable {
+        private let id: UUID
+        private let description: String?
+        private let location: String?
+        private let url: URL
+        
+        init(_ image: LocalFeedImage) {
+            id = image.id
+            description = image.description
+            location = image.location
+            url = image.url
+        }
+        
+        var local: LocalFeedImage {
+            return LocalFeedImage(id: id, description: description, location: location, url: url)
+        }
+    }
+    
+    private let storeURL: URL
+    
+    init(storeURL: URL) {
+        self.storeURL = storeURL
+    }
+    
     func retrieve(completion: @escaping FeedStore.RetrievalCompletion) {
-        completion(.empty)
+        guard let data = try? Data.init(contentsOf: storeURL) else {
+            completion(.empty)
+            return
+        }
+        
+        let cache = try! JSONDecoder().decode(Cache.self, from: data)
+        completion(.found(feed: cache.localFeed, timestamp: cache.timestamp))
+    }
+    
+    func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping FeedStore.InsertionCompletion) {
+
+        let encoder = JSONEncoder()
+        let cache = Cache(feed: feed.map({ CodableFeedImage($0) }), timestamp: timestamp)
+        let encoded = try! encoder.encode(cache)
+        try! encoded.write(to: storeURL)
+        completion(nil)
     }
 }
 
 class CodableFeedStoreTests: XCTestCase {
+    
+    override func setUp() {
+        super.setUp()
+        setupEmptyStoreState()
+    }
+    
+    override func tearDown() {
+        super.tearDown()
+        undoStoreSideEffects()
+    }
     
     func test_retrieve_deliversEmptyOnEmptyCache() {
         let sut = makeSUT()
@@ -51,12 +110,51 @@ class CodableFeedStoreTests: XCTestCase {
         wait(for: [exp], timeout: 1)
     }
     
+    func test_retrieveAfterInsertingToEmptyCache_deliversInsertedValues() {
+        let sut = makeSUT()
+        let feed = uniqueImageFeed().local
+        let timestamp = Date()
+        let exp = expectation(description: "Wait for cache retrieval")
+        
+        sut.insert(feed, timestamp: timestamp) { (error) in
+            XCTAssertNil(error, "Expected feed to be inserted successfully")
+        
+            sut.retrieve { retrievedResult in
+                switch retrievedResult {
+                case let .found(feed: retrievedFeed, timestamp: retrievedTimestamp):
+                    XCTAssertEqual(retrievedFeed, feed)
+                    XCTAssertEqual(retrievedTimestamp, timestamp)
+                default:
+                    XCTFail("Expected found result with feed \(feed) and \(timestamp), got \(retrievedResult) instead")
+                }
+                exp.fulfill()
+            }
+        }
+        wait(for: [exp], timeout: 1)
+    }
+    
     // MARK: - Helpers
     
-    private func makeSUT() -> CodableFeedStore {
-        let sut = CodableFeedStore()
-        trackForMemoryLeaks(sut)
+    private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> CodableFeedStore {
+        let sut = CodableFeedStore(storeURL: testSpecificStoreURL())
+        trackForMemoryLeaks(sut, file: file, line: line)
         return sut
+    }
+    
+    private func setupEmptyStoreState() {
+        deleteStoreArtifacts()
+    }
+    
+    private func undoStoreSideEffects() {
+        deleteStoreArtifacts()
+    }
+    
+    private func deleteStoreArtifacts() {
+        try? FileManager.default.removeItem(at: testSpecificStoreURL())
+    }
+    
+    private func testSpecificStoreURL() -> URL {
+        FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!.appendingPathComponent("\(type(of: self)).store")
     }
     
 }
