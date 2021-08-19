@@ -45,16 +45,15 @@ class CodableFeedStore {
     
     func retrieve(completion: @escaping FeedStore.RetrievalCompletion) {
         guard let data = try? Data.init(contentsOf: storeURL) else {
-            completion(.empty)
-            return
+            return completion(.empty)
         }
         
-        let cache = try! JSONDecoder().decode(Cache.self, from: data)
+        let decoder = JSONDecoder()
+        let cache = try! decoder.decode(Cache.self, from: data)
         completion(.found(feed: cache.localFeed, timestamp: cache.timestamp))
     }
     
     func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping FeedStore.InsertionCompletion) {
-
         let encoder = JSONEncoder()
         let cache = Cache(feed: feed.map({ CodableFeedImage($0) }), timestamp: timestamp)
         let encoded = try! encoder.encode(cache)
@@ -83,6 +82,7 @@ class CodableFeedStoreTests: XCTestCase {
             switch result {
             case .empty:
                 break
+                
             default:
                 XCTFail("Expected empty result, got \(result) instead")
             }
@@ -154,7 +154,7 @@ class CodableFeedStoreTests: XCTestCase {
     }
     
     private func testSpecificStoreURL() -> URL {
-        FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!.appendingPathComponent("\(type(of: self)).store")
+        return FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!.appendingPathComponent("\(type(of: self)).store")
     }
     
 }
