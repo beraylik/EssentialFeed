@@ -17,7 +17,7 @@ class CodableFeedStore {
 class CodableFeedStoreTests: XCTestCase {
     
     func test_retrieve_deliversEmptyOnEmptyCache() {
-        let sut = CodableFeedStore()
+        let sut = makeSUT()
         
         sut.retrieve { result in
             switch result {
@@ -30,7 +30,7 @@ class CodableFeedStoreTests: XCTestCase {
     }
     
     func test_retrieve_hasNoSideEffectsOnEmptyCache() {
-        let sut = CodableFeedStore()
+        let sut = makeSUT()
         
         sut.retrieve { firstResult in
             sut.retrieve { secondResult in
@@ -42,6 +42,12 @@ class CodableFeedStoreTests: XCTestCase {
                 }
             }
         }
+    }
+    
+    // MARK: - Helpers
+    
+    private func makeSUT() -> CodableFeedStore {
+        return CodableFeedStore()
     }
     
 }
