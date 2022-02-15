@@ -121,6 +121,10 @@ final class FeedViewControllerTests: XCTestCase {
         XCTAssertEqual(view0?.isShowingLoadingIndicator, false, "Expected no loading indicator for first view once first image loading completes successfully")
         XCTAssertEqual(view1?.isShowingLoadingIndicator, true, "Expected no loading indicator state change for second view once first image loading completes successfully")
         
+        loader.completeImageLoadingWithError(at: 1)
+        XCTAssertEqual(view0?.isShowingLoadingIndicator, false, "Expected no loading indicator state change for first view once second image loading completes with error")
+        XCTAssertEqual(view1?.isShowingLoadingIndicator, false, "Expected no loading indicator for second view once second image loading completes with error")
+        
     }
     
     // MARK: - Helpers
