@@ -133,16 +133,15 @@ final class SignInModelTests: XCTestCase {
         
         let session = AuthSession(idToken: "id", accessToken: "access", refreshToken: "refresh")
         let userProfile = UserProfile(firstName: "first", lastName: "last")
-        let accountInfo = AccountInfo(askErythemaQuestion: true, lowDoseFlag: true, skinType: 1)
+        let accountInfo = AccountInfo(askErythemaQuestion: true, lowDoseFlag: true, skinType: 0)
         authServiceSpy?.loginResult = .success(.done)
         authServiceSpy?.sessionResult = .success(session)
         authServiceSpy?.userResult = .success(userProfile)
         cloudApiSpy?.accountResult = .success(accountInfo)
         
-        expect(sut, toCompleteLoginWith: .showHomeScreen(token: "access", skinType: 1))
+        expect(sut, toCompleteLoginWith: .showWelcomeScreen)
         
-        XCTAssertEqual(authServiceSpy?.events, [.login, .fetchAuthSession, .fetchUserProfile])
-        XCTAssertEqual(cloudApiSpy?.events, [.getAccount])
+        XCTAssertEqual(cacheSpy?.events, [.saveSkinType(0, askErythemaQuestion: true)])
     }
 
     func test_postTreatment_sendActionToCloudAPI() {
