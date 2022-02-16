@@ -89,9 +89,23 @@ final class SignInModelTests: XCTestCase {
         cloudApiSpy?.accountResult = .failure(error)
         
         expect(sut, toCompleteLoginWith: .error(title: "Login Again", message: "First time login"))
+    }
+    
+    func test_login_requestLogoutOnGetAccountError() {
+        let sut = makeSUT()
         
-        XCTAssertEqual(authServiceSpy?.events, [.login, .fetchAuthSession, .fetchUserProfile, .logout])
+        let error = NSError(domain: "an error", code: 0)
+        let session = AuthSession(idToken: "id", accessToken: "access", refreshToken: "refresh")
+        let userProfile = UserProfile(firstName: "first", lastName: "last")
+        authServiceSpy?.loginResult = .success(.done)
+        authServiceSpy?.sessionResult = .success(session)
+        authServiceSpy?.userResult = .success(userProfile)
+        cloudApiSpy?.accountResult = .failure(error)
+        
+        expect(sut, toCompleteLoginWith: .error(title: "Login Again", message: "First time login"))
+        
         XCTAssertEqual(cloudApiSpy?.events, [.getAccount])
+        XCTAssertEqual(authServiceSpy?.events.last, .logout)
     }
     
     func test_login_showWelcomeScreenOnSuccessWithoutSkinType() {
