@@ -90,7 +90,7 @@ final class SignInModelTests: XCTestCase {
         
         expect(sut, toCompleteLoginWith: .error(title: "Login Again", message: "First time login"))
         
-        XCTAssertEqual(authServiceSpy?.events, [.login, .fetchAuthSession, .fetchUserProfile])
+        XCTAssertEqual(authServiceSpy?.events, [.login, .fetchAuthSession, .fetchUserProfile, .logout])
         XCTAssertEqual(cloudApiSpy?.events, [.getAccount])
     }
     
@@ -112,6 +112,23 @@ final class SignInModelTests: XCTestCase {
     }
     
     func test_login_showHomeScreenOnSuccessWithSkinType() {
+        let sut = makeSUT()
+        
+        let session = AuthSession(idToken: "id", accessToken: "access", refreshToken: "refresh")
+        let userProfile = UserProfile(firstName: "first", lastName: "last")
+        let accountInfo = AccountInfo(askErythemaQuestion: true, lowDoseFlag: true, skinType: 1)
+        authServiceSpy?.loginResult = .success(.done)
+        authServiceSpy?.sessionResult = .success(session)
+        authServiceSpy?.userResult = .success(userProfile)
+        cloudApiSpy?.accountResult = .success(accountInfo)
+        
+        expect(sut, toCompleteLoginWith: .showHomeScreen(token: "access", skinType: 1))
+        
+        XCTAssertEqual(authServiceSpy?.events, [.login, .fetchAuthSession, .fetchUserProfile])
+        XCTAssertEqual(cloudApiSpy?.events, [.getAccount])
+    }
+    
+    func test_login_storesSkinTypeOnSuccessfulLogin() {
         let sut = makeSUT()
         
         let session = AuthSession(idToken: "id", accessToken: "access", refreshToken: "refresh")
@@ -152,8 +169,8 @@ final class SignInModelTests: XCTestCase {
             }
             exp.fulfill()
         }
-        wait(for: [exp], timeout: 1)
         
+        wait(for: [exp], timeout: 1)
         XCTAssertTrue(completionIsSuccess)
     }
     
@@ -173,8 +190,8 @@ final class SignInModelTests: XCTestCase {
             }
             exp.fulfill()
         }
-        wait(for: [exp], timeout: 1)
         
+        wait(for: [exp], timeout: 1)
         XCTAssertTrue(completionIsFailure)
     }
     
@@ -187,13 +204,52 @@ final class SignInModelTests: XCTestCase {
         sut.postTreatment(accessToken: "", skinType: 0) { result in
             exp.fulfill()
         }
-        wait(for: [exp], timeout: 1)
         
-        let expectedEvent = CacheSpy.Event.saveTreatment(id: treatmentInfo.SessionId,
-                                                         dosePoint: treatmentInfo.DosePoint,
-                                                         sideExposedFront: treatmentInfo.SideExposedFront,
-                                                         duration: treatmentInfo.SessionDurationSeconds)
+        wait(for: [exp], timeout: 1)
+        let expectedEvent = CacheSpy.Event.saveTreatment(id: treatmentInfo.SessionId, dose: treatmentInfo.DosePoint, isFrontSide: treatmentInfo.SideExposedFront, duration: treatmentInfo.SessionDurationSeconds)
         XCTAssertEqual(cacheSpy?.events, [expectedEvent])
+    }
+    
+    func test_logout_requestLogoutFromAuthService() {
+        let sut = makeSUT()
+        
+        sut.logout()
+        
+        XCTAssertEqual(authServiceSpy?.events, [.logout])
+    }
+    
+    func test_logout_doesNotClearCacheOnFailure() {
+        let sut = makeSUT()
+        
+        sut.logout()
+        authServiceSpy?.completeLogoutWithFailure()
+        
+        XCTAssertEqual(cacheSpy?.events, [])
+    }
+    
+    func test_logout_clearCacheOnSuccess() {
+        let sut = makeSUT()
+        
+        sut.logout()
+        authServiceSpy?.completeLogoutWithSuccess()
+        
+        XCTAssertEqual(cacheSpy?.events, [.clearCache])
+    }
+    
+    func test_validateEmail_performsValidation() {
+        let sut = makeSUT()
+        
+        _ = sut.validate(email: "email")
+            
+        XCTAssertEqual(validatorSpy?.events, [.validateEmail])
+    }
+    
+    func test_validatePassword_performsValidation() {
+        let sut = makeSUT()
+        
+        _ = sut.validate(password: "password")
+            
+        XCTAssertEqual(validatorSpy?.events, [.validatePassword])
     }
     
     // MARK: - Helpers
@@ -242,6 +298,7 @@ final class SignInModelTests: XCTestCase {
             case login
             case fetchAuthSession
             case fetchUserProfile
+            case logout
         }
         
         private(set) var events = [Event]()
@@ -249,6 +306,18 @@ final class SignInModelTests: XCTestCase {
         var loginResult: LoginResult?
         var sessionResult: SessionResult?
         var userResult: UserResult?
+        var logoutResult: LogoutResult?
+        
+        var logoutCompletion: LogoutCompletion?
+        
+        func completeLogoutWithSuccess() {
+            logoutCompletion?(.success(()))
+        }
+        
+        func completeLogoutWithFailure() {
+            let error = SLError(userMessage: "an error")
+            logoutCompletion?(.failure(error))
+        }
         
         // MARK: AuthService
         
@@ -267,9 +336,14 @@ final class SignInModelTests: XCTestCase {
             completion(userResult!)
         }
         
+        func logout(completion: @escaping LogoutCompletion) {
+            events.append(.logout)
+            logoutCompletion = completion
+        }
+        
         // Unused
         func resetPassword(username: String, completion: @escaping ResetCompletion) {}
-        func logout(completion: @escaping LogoutCompletion) {}
+        
     }
     
     private class CloudApiSpy: CloudApi {
@@ -305,7 +379,9 @@ final class SignInModelTests: XCTestCase {
     
     private class CacheSpy: SignInCacheProtocol {
         enum Event: Equatable {
-            case saveTreatment(id: Int, dosePoint: Int, sideExposedFront: Bool, duration: Int)
+            case saveTreatment(id: Int, dose: Int, isFrontSide: Bool, duration: Int)
+            case saveSkinType(_ skinType: Int?, askErythemaQuestion: Bool)
+            case clearCache
         }
         
         private(set) var events = [Event]()
@@ -317,7 +393,7 @@ final class SignInModelTests: XCTestCase {
         }
         
         func saveTreatmentSession(id: Int, dosePoint: Int, sideExposedFront: Bool, duration: Int) {
-            events.append(.saveTreatment(id: id, dosePoint: dosePoint, sideExposedFront: sideExposedFront, duration: duration))
+            events.append(.saveTreatment(id: id, dose: dosePoint, isFrontSide: sideExposedFront, duration: duration))
         }
         
         func setName(_ name: String) {
@@ -325,17 +401,18 @@ final class SignInModelTests: XCTestCase {
         }
         
         func saveSkinType(_ skinType: Int?, askErythemaQuestion: Bool) {
-            
+            events.append(.saveSkinType(skinType, askErythemaQuestion: askErythemaQuestion))
         }
         
         func clear() {
-            
+            events.append(.clearCache)
         }
     }
     
     private class ValidatorSpy: SignInValidator {
         enum Event: Equatable {
-
+            case validateEmail
+            case validatePassword
         }
         
         private(set) var events = [Event]()
@@ -343,10 +420,12 @@ final class SignInModelTests: XCTestCase {
         // MARK: SignInValidator
         
         func validateEmail(_ email: String) -> Bool {
+            events.append(.validateEmail)
             return false
         }
         
         func validatePassword(_ password: String) -> Bool {
+            events.append(.validatePassword)
             return false
         }
     }
