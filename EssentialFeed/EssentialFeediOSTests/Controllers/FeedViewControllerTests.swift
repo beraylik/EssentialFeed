@@ -336,52 +336,6 @@ final class FeedViewControllerTests: XCTestCase {
     
 }
 
-private extension FeedViewController {
-    var isShowingLoadingIndicator: Bool {
-        return refreshControl?.isRefreshing == true
-    }
-    
-    var feedImagesSection: Int {
-        return 0
-    }
-    
-    func numberOfRenderedFeedImageViews() -> Int {
-        return tableView(tableView, numberOfRowsInSection: feedImagesSection)
-    }
-    
-    func simulateUserInitiatedFeedReload() {
-        refreshControl?.simulatePullToRefresh()
-    }
-    
-    @discardableResult
-    func simulateFeedImageViewVisible(at index: Int) -> FeedImageCell? {
-        return feedImageView(at: index) as? FeedImageCell
-    }
-    
-    func simulateFeedImageViewNotVisible(at row: Int) {
-        let view = simulateFeedImageViewVisible(at: row)
-        let index = IndexPath(row: row, section: feedImagesSection)
-        tableView.delegate?.tableView?(tableView, didEndDisplaying: view!, forRowAt: index)
-    }
-    
-    func feedImageView(at row: Int) -> UITableViewCell? {
-        let index = IndexPath(row: row, section: feedImagesSection)
-        return tableView.dataSource?.tableView(tableView, cellForRowAt: index)
-    }
-    
-    func simulateFeedImageViewNearVisible(at row: Int) {
-        let index = IndexPath(row: row, section: feedImagesSection)
-        tableView.prefetchDataSource?.tableView(tableView, prefetchRowsAt: [index])
-    }
-    
-    func simulateFeedImageViewNotNearVisible(at row: Int) {
-        simulateFeedImageViewNearVisible(at: row)
-        
-        let index = IndexPath(row: row, section: feedImagesSection)
-        tableView.prefetchDataSource?.tableView?(tableView, cancelPrefetchingForRowsAt: [index])
-    }
-}
-
 private extension FeedImageCell {
     var isShowingLocation: Bool {
         return !locationContainer.isHidden
