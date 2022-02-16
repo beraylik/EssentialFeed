@@ -44,19 +44,14 @@ final class SignInModelTests: XCTestCase {
         let sut = makeSUT()
         
         let error = SLError(userMessage: "an error")
-        authServiceSpy?.loginResult = .failure(error)
+        authServiceSpy?.expectLoginRequest(with: .failure(error))
         
         expect(sut, toCompleteLoginWith: .error(title: "Login Failed", message: error.userMessage))
-        
-        XCTAssertEqual(authServiceSpy?.events, [.login])
     }
     
     func test_login_fetchErrorOnSessionError() {
         let sut = makeSUT()
-        
-        let error = SLError(userMessage: "an error")
-        authServiceSpy?.loginResult = .success(.done)
-        authServiceSpy?.sessionResult = .failure(error)
+        let error = authServiceSpy!.expectSessionRequestWithError()
         
         expect(sut, toCompleteLoginWith: .error(title: "Login Failed", message: error.userMessage))
         
@@ -65,13 +60,8 @@ final class SignInModelTests: XCTestCase {
     
     func test_login_fetchErrorOnFetchingUserProfile() {
         let sut = makeSUT()
-        
-        let error = SLError(userMessage: "an error")
-        let session = AuthSession(idToken: "id", accessToken: "access", refreshToken: "refresh")
-        authServiceSpy?.loginResult = .success(.done)
-        authServiceSpy?.sessionResult = .success(session)
-        authServiceSpy?.userResult = .failure(error)
-        
+        let error = authServiceSpy!.expectUserProfileRequestWithError()
+    
         expect(sut, toCompleteLoginWith: .error(title: "Login Failed", message: error.userMessage))
         
         XCTAssertEqual(authServiceSpy?.events, [.login, .fetchAuthSession, .fetchUserProfile])
@@ -80,26 +70,20 @@ final class SignInModelTests: XCTestCase {
     func test_login_fetchErrorOnGetAccountError() {
         let sut = makeSUT()
         
-        let error = NSError(domain: "an error", code: 0)
-        let session = AuthSession(idToken: "id", accessToken: "access", refreshToken: "refresh")
-        let userProfile = UserProfile(firstName: "first", lastName: "last")
-        authServiceSpy?.loginResult = .success(.done)
-        authServiceSpy?.sessionResult = .success(session)
-        authServiceSpy?.userResult = .success(userProfile)
+        authServiceSpy?.expectUserProfileRequestWithSuccess()
+        let error = SLError(userMessage: "an error")
         cloudApiSpy?.accountResult = .failure(error)
         
         expect(sut, toCompleteLoginWith: .error(title: "Login Again", message: "First time login"))
+        
+        XCTAssertEqual(cloudApiSpy?.events, [.getAccount])
     }
     
     func test_login_requestLogoutOnGetAccountError() {
         let sut = makeSUT()
         
-        let error = NSError(domain: "an error", code: 0)
-        let session = AuthSession(idToken: "id", accessToken: "access", refreshToken: "refresh")
-        let userProfile = UserProfile(firstName: "first", lastName: "last")
-        authServiceSpy?.loginResult = .success(.done)
-        authServiceSpy?.sessionResult = .success(session)
-        authServiceSpy?.userResult = .success(userProfile)
+        authServiceSpy?.expectUserProfileRequestWithSuccess()
+        let error = SLError(userMessage: "an error")
         cloudApiSpy?.accountResult = .failure(error)
         
         expect(sut, toCompleteLoginWith: .error(title: "Login Again", message: "First time login"))
@@ -111,12 +95,21 @@ final class SignInModelTests: XCTestCase {
     func test_login_showWelcomeScreenOnSuccessWithoutSkinType() {
         let sut = makeSUT()
         
-        let session = AuthSession(idToken: "id", accessToken: "access", refreshToken: "refresh")
-        let userProfile = UserProfile(firstName: "first", lastName: "last")
+        authServiceSpy?.expectUserProfileRequestWithSuccess()
+        let accountInfo = AccountInfo(askErythemaQuestion: true, lowDoseFlag: true, skinType: nil)
+        cloudApiSpy?.accountResult = .success(accountInfo)
+        
+        expect(sut, toCompleteLoginWith: .showWelcomeScreen)
+        
+        XCTAssertEqual(authServiceSpy?.events, [.login, .fetchAuthSession, .fetchUserProfile])
+        XCTAssertEqual(cloudApiSpy?.events, [.getAccount])
+    }
+    
+    func test_login_showWelcomeScreenOnSuccessWithNotSelectedSkinType() {
+        let sut = makeSUT()
+        
+        authServiceSpy?.expectUserProfileRequestWithSuccess()
         let accountInfo = AccountInfo(askErythemaQuestion: true, lowDoseFlag: true, skinType: 0)
-        authServiceSpy?.loginResult = .success(.done)
-        authServiceSpy?.sessionResult = .success(session)
-        authServiceSpy?.userResult = .success(userProfile)
         cloudApiSpy?.accountResult = .success(accountInfo)
         
         expect(sut, toCompleteLoginWith: .showWelcomeScreen)
@@ -128,12 +121,8 @@ final class SignInModelTests: XCTestCase {
     func test_login_showHomeScreenOnSuccessWithSkinType() {
         let sut = makeSUT()
         
-        let session = AuthSession(idToken: "id", accessToken: "access", refreshToken: "refresh")
-        let userProfile = UserProfile(firstName: "first", lastName: "last")
+        authServiceSpy?.expectUserProfileRequestWithSuccess()
         let accountInfo = AccountInfo(askErythemaQuestion: true, lowDoseFlag: true, skinType: 1)
-        authServiceSpy?.loginResult = .success(.done)
-        authServiceSpy?.sessionResult = .success(session)
-        authServiceSpy?.userResult = .success(userProfile)
         cloudApiSpy?.accountResult = .success(accountInfo)
         
         expect(sut, toCompleteLoginWith: .showHomeScreen(token: "access", skinType: 1))
@@ -145,12 +134,8 @@ final class SignInModelTests: XCTestCase {
     func test_login_storesSkinTypeOnSuccessfulLogin() {
         let sut = makeSUT()
         
-        let session = AuthSession(idToken: "id", accessToken: "access", refreshToken: "refresh")
-        let userProfile = UserProfile(firstName: "first", lastName: "last")
+        authServiceSpy?.expectUserProfileRequestWithSuccess()
         let accountInfo = AccountInfo(askErythemaQuestion: true, lowDoseFlag: true, skinType: 0)
-        authServiceSpy?.loginResult = .success(.done)
-        authServiceSpy?.sessionResult = .success(session)
-        authServiceSpy?.userResult = .success(userProfile)
         cloudApiSpy?.accountResult = .success(accountInfo)
         
         expect(sut, toCompleteLoginWith: .showWelcomeScreen)
@@ -322,6 +307,42 @@ final class SignInModelTests: XCTestCase {
         var logoutResult: LogoutResult?
         
         var logoutCompletion: LogoutCompletion?
+         
+        func expectLoginRequest(with result: LoginResult) {
+            loginResult = result
+        }
+        
+        @discardableResult
+        func expectSessionRequestWithSuccess() -> AuthSession {
+            expectLoginRequest(with: .success(.done))
+            let session = AuthSession(idToken: "id", accessToken: "access", refreshToken: "refresh")
+            sessionResult = .success(session)
+            return session
+        }
+        
+        @discardableResult
+        func expectSessionRequestWithError() -> SLError {
+            expectLoginRequest(with: .success(.done))
+            let error = SLError(userMessage: "an error")
+            sessionResult = .failure(error)
+            return error
+        }
+        
+        @discardableResult
+        func expectUserProfileRequestWithSuccess() -> UserProfile {
+            expectSessionRequestWithSuccess()
+            let userProfile = UserProfile(firstName: "first", lastName: "last")
+            userResult = .success(userProfile)
+            return userProfile
+        }
+        
+        @discardableResult
+        func expectUserProfileRequestWithError() -> SLError {
+            expectSessionRequestWithSuccess()
+            let error = SLError(userMessage: "an error")
+            userResult = .failure(error)
+            return error
+        }
         
         func completeLogoutWithSuccess() {
             logoutCompletion?(.success(()))
