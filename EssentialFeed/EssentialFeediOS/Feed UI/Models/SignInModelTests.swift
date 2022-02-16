@@ -42,6 +42,7 @@ final class SignInModelTests: XCTestCase {
     
     func test_login_fetchErrorOnLoginError() {
         let sut = makeSUT()
+        
         let error = SLError(userMessage: "an error")
         authServiceSpy?.loginResult = .failure(error)
         
@@ -52,6 +53,7 @@ final class SignInModelTests: XCTestCase {
     
     func test_login_fetchErrorOnSessionError() {
         let sut = makeSUT()
+        
         let error = SLError(userMessage: "an error")
         authServiceSpy?.loginResult = .success(.done)
         authServiceSpy?.sessionResult = .failure(error)
@@ -63,6 +65,7 @@ final class SignInModelTests: XCTestCase {
     
     func test_login_fetchErrorOnFetchingUserProfile() {
         let sut = makeSUT()
+        
         let error = SLError(userMessage: "an error")
         let session = AuthSession(idToken: "id", accessToken: "access", refreshToken: "refresh")
         authServiceSpy?.loginResult = .success(.done)
@@ -76,6 +79,7 @@ final class SignInModelTests: XCTestCase {
     
     func test_login_fetchErrorOnGetAccountError() {
         let sut = makeSUT()
+        
         let error = NSError(domain: "an error", code: 0)
         let session = AuthSession(idToken: "id", accessToken: "access", refreshToken: "refresh")
         let userProfile = UserProfile(firstName: "first", lastName: "last")
@@ -92,6 +96,7 @@ final class SignInModelTests: XCTestCase {
     
     func test_login_showWelcomeScreenOnSuccessWithoutSkinType() {
         let sut = makeSUT()
+        
         let session = AuthSession(idToken: "id", accessToken: "access", refreshToken: "refresh")
         let userProfile = UserProfile(firstName: "first", lastName: "last")
         let accountInfo = AccountInfo(askErythemaQuestion: true, lowDoseFlag: true, skinType: 0)
@@ -108,6 +113,7 @@ final class SignInModelTests: XCTestCase {
     
     func test_login_showHomeScreenOnSuccessWithSkinType() {
         let sut = makeSUT()
+        
         let session = AuthSession(idToken: "id", accessToken: "access", refreshToken: "refresh")
         let userProfile = UserProfile(firstName: "first", lastName: "last")
         let accountInfo = AccountInfo(askErythemaQuestion: true, lowDoseFlag: true, skinType: 1)
@@ -122,6 +128,74 @@ final class SignInModelTests: XCTestCase {
         XCTAssertEqual(cloudApiSpy?.events, [.getAccount])
     }
 
+    func test_postTreatment_sendActionToCloudAPI() {
+        let sut = makeSUT()
+        
+        sut.postTreatment(accessToken: "", skinType: 0) { _ in }
+        
+        XCTAssertEqual(cloudApiSpy?.events, [.postTreatment])
+    }
+    
+    func test_postTreatment_completesWithSuccessOnAPISuccess() {
+        let sut = makeSUT()
+        let treatmentInfo = TreatmentInfo(TreatmentBlockedReason: "", SessionId: 1, SkinType: 0, DosePoint: 1, TreatmentBlocked: false, Intensity: 0, SideExposedFront: true, SessionDurationSeconds: 1, LowDoseFlag: false, DoseDiscovery: false)
+        cloudApiSpy?.treatmentResult = .success(treatmentInfo)
+        
+        var completionIsSuccess: Bool = false
+        let exp = expectation(description: "wait for the response")
+        sut.postTreatment(accessToken: "", skinType: 0) { result in
+            switch result {
+            case .success:
+                completionIsSuccess = true
+            case .failure:
+                XCTFail("Expected success, got failure instead")
+            }
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 1)
+        
+        XCTAssertTrue(completionIsSuccess)
+    }
+    
+    func test_postTreatment_completesWithFailureOnAPIError() {
+        let sut = makeSUT()
+        let error = NSError(domain: "an error", code: 0)
+        cloudApiSpy?.treatmentResult = .failure(error)
+        
+        var completionIsFailure: Bool = false
+        let exp = expectation(description: "wait for the response")
+        sut.postTreatment(accessToken: "", skinType: 0) { result in
+            switch result {
+            case .failure:
+                completionIsFailure = true
+            case .success:
+                XCTFail("Expected failure, got success instead")
+            }
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 1)
+        
+        XCTAssertTrue(completionIsFailure)
+    }
+    
+    func test_postTreatment_storesTreatmentSessionOnSuccess() {
+        let sut = makeSUT()
+        let treatmentInfo = TreatmentInfo(TreatmentBlockedReason: "", SessionId: 1, SkinType: 0, DosePoint: 1, TreatmentBlocked: false, Intensity: 0, SideExposedFront: true, SessionDurationSeconds: 1, LowDoseFlag: false, DoseDiscovery: false)
+        cloudApiSpy?.treatmentResult = .success(treatmentInfo)
+        
+        let exp = expectation(description: "wait for the response")
+        sut.postTreatment(accessToken: "", skinType: 0) { result in
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 1)
+        
+        let expectedEvent = CacheSpy.Event.saveTreatment(id: treatmentInfo.SessionId,
+                                                         dosePoint: treatmentInfo.DosePoint,
+                                                         sideExposedFront: treatmentInfo.SideExposedFront,
+                                                         duration: treatmentInfo.SessionDurationSeconds)
+        XCTAssertEqual(cacheSpy?.events, [expectedEvent])
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT() -> SignInModel {
@@ -218,7 +292,9 @@ final class SignInModelTests: XCTestCase {
         
         func postTreatment(token: String, skinType: Int, completion: @escaping (Result<TreatmentInfo, Error>) -> Void) {
             events.append(.postTreatment)
-            completion(treatmentResult!)
+            if let treatmentResult = treatmentResult {
+                completion(treatmentResult)
+            }
         }
         
         // Unused
@@ -229,7 +305,7 @@ final class SignInModelTests: XCTestCase {
     
     private class CacheSpy: SignInCacheProtocol {
         enum Event: Equatable {
-
+            case saveTreatment(id: Int, dosePoint: Int, sideExposedFront: Bool, duration: Int)
         }
         
         private(set) var events = [Event]()
@@ -241,7 +317,7 @@ final class SignInModelTests: XCTestCase {
         }
         
         func saveTreatmentSession(id: Int, dosePoint: Int, sideExposedFront: Bool, duration: Int) {
-            
+            events.append(.saveTreatment(id: id, dosePoint: dosePoint, sideExposedFront: sideExposedFront, duration: duration))
         }
         
         func setName(_ name: String) {
