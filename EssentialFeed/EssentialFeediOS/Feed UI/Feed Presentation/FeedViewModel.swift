@@ -5,7 +5,6 @@
 //  Created by Genrikh Beraylik on 16.02.2022.
 //
 
-import Foundation
 import EssentialFeed
 
 final class FeedViewModel {
