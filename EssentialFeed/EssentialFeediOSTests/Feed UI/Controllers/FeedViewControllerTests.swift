@@ -249,8 +249,6 @@ final class FeedViewControllerTests: XCTestCase {
         return (sut, loader)
     }
     
-   
-    
     private func makeImage(description: String? = nil, location: String? = nil, url: URL = URL(string: "http://any-url.com")!) -> FeedImage {
         return FeedImage(id: UUID(), description: description, location: location, url: url)
     }
