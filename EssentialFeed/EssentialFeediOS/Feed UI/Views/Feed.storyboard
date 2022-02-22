@@ -70,6 +70,14 @@
                                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="gTF-FL-UvN">
                                                             <rect key="frame" x="0.0" y="0.0" width="374" height="374"/>
                                                         </imageView>
+                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hxP-yE-L68">
+                                                            <rect key="frame" x="0.0" y="0.0" width="374" height="374"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="60"/>
+                                                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                                            <state key="normal" title="↻">
+                                                                <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                            </state>
+                                                        </button>
                                                     </subviews>
                                                     <color key="backgroundColor" red="0.89019607840000003" green="0.89019607840000003" blue="0.89019607840000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <constraints>
@@ -78,6 +86,10 @@
                                                         <constraint firstAttribute="trailing" secondItem="gTF-FL-UvN" secondAttribute="trailing" id="QT0-gm-9Ji"/>
                                                         <constraint firstAttribute="bottom" secondItem="gTF-FL-UvN" secondAttribute="bottom" id="R9M-4j-f1J"/>
                                                         <constraint firstItem="gTF-FL-UvN" firstAttribute="top" secondItem="l4A-SE-Ek3" secondAttribute="top" id="SvN-58-SnN"/>
+                                                        <constraint firstItem="hxP-yE-L68" firstAttribute="leading" secondItem="l4A-SE-Ek3" secondAttribute="leading" id="VpQ-GN-oTY"/>
+                                                        <constraint firstAttribute="trailing" secondItem="hxP-yE-L68" secondAttribute="trailing" id="ZmE-CH-Ltc"/>
+                                                        <constraint firstAttribute="bottom" secondItem="hxP-yE-L68" secondAttribute="bottom" id="nBL-h2-eaK"/>
+                                                        <constraint firstItem="hxP-yE-L68" firstAttribute="top" secondItem="l4A-SE-Ek3" secondAttribute="top" id="qCi-oh-foh"/>
                                                     </constraints>
                                                     <userDefinedRuntimeAttributes>
                                                         <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
