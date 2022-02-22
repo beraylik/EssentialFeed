@@ -77,6 +77,9 @@
                                                             <state key="normal" title="↻">
                                                                 <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </state>
+                                                            <connections>
+                                                                <action selector="retryButtonTapped" destination="CS0-42-9lZ" eventType="touchUpInside" id="Ey9-vY-UdY"/>
+                                                            </connections>
                                                         </button>
                                                     </subviews>
                                                     <color key="backgroundColor" red="0.89019607840000003" green="0.89019607840000003" blue="0.89019607840000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -118,6 +121,14 @@
                                         <constraint firstItem="AUD-bY-Ihd" firstAttribute="leading" secondItem="Cez-Pa-5Ha" secondAttribute="leadingMargin" id="gAc-Gi-9BO"/>
                                     </constraints>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="descriptionLabel" destination="18H-bS-A78" id="TAu-mO-iNn"/>
+                                    <outlet property="feedImageContainer" destination="l4A-SE-Ek3" id="epN-FZ-BQT"/>
+                                    <outlet property="feedImageRetryButton" destination="hxP-yE-L68" id="aGs-ES-TEy"/>
+                                    <outlet property="feedImageView" destination="gTF-FL-UvN" id="igN-0k-A6o"/>
+                                    <outlet property="locationContainer" destination="BWm-aO-OJq" id="KBy-qB-812"/>
+                                    <outlet property="locationLabel" destination="s0p-Vd-uMs" id="ekm-98-bXA"/>
+                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>
