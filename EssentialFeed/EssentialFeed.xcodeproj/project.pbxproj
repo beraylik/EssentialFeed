@@ -87,6 +87,7 @@
 		6FEF9AAE27EC67E6004603FC /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FEF9AAD27EC67E6004603FC /* ErrorView.swift */; };
 		6FEF9AB127EC6BC0004603FC /* FeedErrorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FEF9AB027EC6BC0004603FC /* FeedErrorViewModel.swift */; };
 		6FEF9AB327EC6C29004603FC /* UIRefreshControl+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FEF9AB227EC6C29004603FC /* UIRefreshControl+Helpers.swift */; };
+		6FEF9AB627EC74D1004603FC /* Feed.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6FEF9AB827EC74D1004603FC /* Feed.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -222,6 +223,8 @@
 		6FEF9AAD27EC67E6004603FC /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
 		6FEF9AB027EC6BC0004603FC /* FeedErrorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedErrorViewModel.swift; sourceTree = "<group>"; };
 		6FEF9AB227EC6C29004603FC /* UIRefreshControl+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIRefreshControl+Helpers.swift"; sourceTree = "<group>"; };
+		6FEF9AB727EC74D1004603FC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Feed.strings; sourceTree = "<group>"; };
+		6FEF9AB927EC74D6004603FC /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Feed.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -371,6 +374,7 @@
 				6F77CC7A267CDC8600CB0527 /* Feed API */,
 				6FEF9AAA27EC5ED1004603FC /* Feed Presentation */,
 				6F5A36D82677348700C09FB4 /* Info.plist */,
+				6FEF9AB827EC74D1004603FC /* Feed.strings */,
 			);
 			path = EssentialFeedTests;
 			sourceTree = "<group>";
@@ -806,6 +810,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6FEF9AB627EC74D1004603FC /* Feed.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -986,6 +991,15 @@
 			children = (
 				6F73FBD927C78BDF00A7C58B /* en */,
 				6F73FBDB27C78D2D00A7C58B /* ru */,
+			);
+			name = Feed.strings;
+			sourceTree = "<group>";
+		};
+		6FEF9AB827EC74D1004603FC /* Feed.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6FEF9AB727EC74D1004603FC /* en */,
+				6FEF9AB927EC74D6004603FC /* ru */,
 			);
 			name = Feed.strings;
 			sourceTree = "<group>";
