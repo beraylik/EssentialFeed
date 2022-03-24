@@ -86,6 +86,7 @@
 		6FEF9AAC27EC5F3E004603FC /* FeedPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FEF9AAB27EC5F3E004603FC /* FeedPresenterTests.swift */; };
 		6FEF9AAE27EC67E6004603FC /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FEF9AAD27EC67E6004603FC /* ErrorView.swift */; };
 		6FEF9AB127EC6BC0004603FC /* FeedErrorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FEF9AB027EC6BC0004603FC /* FeedErrorViewModel.swift */; };
+		6FEF9AB327EC6C29004603FC /* UIRefreshControl+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FEF9AB227EC6C29004603FC /* UIRefreshControl+Helpers.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -220,6 +221,7 @@
 		6FEF9AAB27EC5F3E004603FC /* FeedPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedPresenterTests.swift; sourceTree = "<group>"; };
 		6FEF9AAD27EC67E6004603FC /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
 		6FEF9AB027EC6BC0004603FC /* FeedErrorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedErrorViewModel.swift; sourceTree = "<group>"; };
+		6FEF9AB227EC6C29004603FC /* UIRefreshControl+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIRefreshControl+Helpers.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -593,6 +595,7 @@
 				6F68A65127BB85CE0016F054 /* UIView+Shimmering.swift */,
 				6F73FBC727C4DE2D00A7C58B /* UITableView+Dequeueing.swift */,
 				6F73FBC927C4E0E600A7C58B /* UIImageView+Animations.swift */,
+				6FEF9AB227EC6C29004603FC /* UIRefreshControl+Helpers.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -895,6 +898,7 @@
 				6F68A69727BE299F0016F054 /* FeedPresenter.swift in Sources */,
 				6F68A68227BCDCEF0016F054 /* FeedImageDataLoader.swift in Sources */,
 				6FEF9AAE27EC67E6004603FC /* ErrorView.swift in Sources */,
+				6FEF9AB327EC6C29004603FC /* UIRefreshControl+Helpers.swift in Sources */,
 				6F68A69D27BE43640016F054 /* FeedViewModel.swift in Sources */,
 				6F73FBC827C4DE2D00A7C58B /* UITableView+Dequeueing.swift in Sources */,
 				6F68A69B27BE435B0016F054 /* FeedLoadingViewModel.swift in Sources */,
