@@ -21,7 +21,7 @@ class URLSessionHTTPClientTests: XCTestCase {
     }
     
     func test_getFromURL_performsGETRequestWithUrl() {
-        let url = anyUrl()
+        let url = anyURL()
         let exp = expectation(description: "Wait for request")
         
         URLProtocolStub.observeRequests { request in
@@ -116,7 +116,7 @@ class URLSessionHTTPClientTests: XCTestCase {
         let exp = expectation(description: "wait for completion")
         
         var receivedResult: HTTPClient.Result!
-        sut.get(from: anyUrl()) { result in
+        sut.get(from: anyURL()) { result in
             receivedResult = result
             exp.fulfill()
         }
@@ -130,11 +130,11 @@ class URLSessionHTTPClientTests: XCTestCase {
     }
     
     private func nonHTTPURLResponse() -> URLResponse {
-        return URLResponse(url: anyUrl(), mimeType: nil, expectedContentLength: 0, textEncodingName: nil)
+        return URLResponse(url: anyURL(), mimeType: nil, expectedContentLength: 0, textEncodingName: nil)
     }
     
     private func anyHTTPURLResponse() -> HTTPURLResponse {
-        return HTTPURLResponse(url: anyUrl(), statusCode: 200, httpVersion: nil, headerFields: nil)!
+        return HTTPURLResponse(url: anyURL(), statusCode: 200, httpVersion: nil, headerFields: nil)!
     }
     
     private class URLProtocolStub: URLProtocol {
