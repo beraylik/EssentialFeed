@@ -90,6 +90,7 @@
 		F85D972027F72ACC00745478 /* FeedImageDataLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F68A68127BCDCEF0016F054 /* FeedImageDataLoader.swift */; };
 		F85D972227F72B2300745478 /* RemoteFeedImageDataLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85D972127F72B2300745478 /* RemoteFeedImageDataLoaderTests.swift */; };
 		F85D972527F74FAF00745478 /* HTTPClientSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85D972427F74FAF00745478 /* HTTPClientSpy.swift */; };
+		F85D972727F8431600745478 /* RemoteFeedImageDataLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85D972627F8431600745478 /* RemoteFeedImageDataLoader.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -228,6 +229,7 @@
 		6FEF9AC927ECA356004603FC /* FeedImageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedImageViewModel.swift; sourceTree = "<group>"; };
 		F85D972127F72B2300745478 /* RemoteFeedImageDataLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteFeedImageDataLoaderTests.swift; sourceTree = "<group>"; };
 		F85D972427F74FAF00745478 /* HTTPClientSpy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClientSpy.swift; sourceTree = "<group>"; };
+		F85D972627F8431600745478 /* RemoteFeedImageDataLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteFeedImageDataLoader.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -309,6 +311,7 @@
 				6F00F6762694D5C4001145CE /* FeedItemMapper.swift */,
 				6F00F6772694D5C4001145CE /* RemoteFeedLoader.swift */,
 				6F444A2226B2D175001D48D3 /* RemoteFeedItem.swift */,
+				F85D972627F8431600745478 /* RemoteFeedImageDataLoader.swift */,
 			);
 			path = FeedApi;
 			sourceTree = "<group>";
@@ -856,6 +859,7 @@
 				6F444A2326B2D175001D48D3 /* RemoteFeedItem.swift in Sources */,
 				6FEF9ACA27ECA356004603FC /* FeedImageViewModel.swift in Sources */,
 				6F444A5726BC028E001D48D3 /* FeedCachePolicy.swift in Sources */,
+				F85D972727F8431600745478 /* RemoteFeedImageDataLoader.swift in Sources */,
 				6F00F6802694D5C4001145CE /* FeedItem.swift in Sources */,
 				6FC4E4AF276B20A200911AC6 /* FeedStore.xcdatamodeld in Sources */,
 				6F444A2826B2D183001D48D3 /* LocalFeedImage.swift in Sources */,
