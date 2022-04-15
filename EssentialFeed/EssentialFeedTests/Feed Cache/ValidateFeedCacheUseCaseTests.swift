@@ -25,7 +25,7 @@ class ValidateFeedCacheUseCaseTests: XCTestCase {
         XCTAssertEqual(store.receivedMessages, [.retrieve, .deleteCacheFeed])
     }
     
-    func test_validateCache_doesNotDeletesCacheOnEmptyCache() {
+    func test_validateCache_doesNotDeleteCacheOnEmptyCache() {
         let (sut, store) = makeSUT()
         
         sut.validateCache { _ in }
@@ -34,7 +34,7 @@ class ValidateFeedCacheUseCaseTests: XCTestCase {
         XCTAssertEqual(store.receivedMessages, [.retrieve])
     }
     
-    func test_validateCache_doesNotDeleteCacheOnNonExpiredCache() {
+    func test_validateCache_doesNotDeleteNonExpiredCache() {
         let feed = uniqueImageFeed()
         let fixedCurrentDate = Date()
         let nonExpiredTimestamp = fixedCurrentDate.minusFeedCacheMaxAge().adding(seconds: 1)
@@ -46,7 +46,7 @@ class ValidateFeedCacheUseCaseTests: XCTestCase {
         XCTAssertEqual(store.receivedMessages, [.retrieve])
     }
     
-    func test_validateCache_deletesCacheOnCacheExpiratoin() {
+    func test_validateCache_deletesCacheOnExpiration() {
         let feed = uniqueImageFeed()
         let fixedCurrentDate = Date()
         let expirationTimestamp = fixedCurrentDate.minusFeedCacheMaxAge()
@@ -58,7 +58,7 @@ class ValidateFeedCacheUseCaseTests: XCTestCase {
         XCTAssertEqual(store.receivedMessages, [.retrieve, .deleteCacheFeed])
     }
     
-    func test_validateCache_hasNoSideEffectsOnExpiredCache() {
+    func test_validateCache_deletesExpiredCache() {
         let feed = uniqueImageFeed()
         let fixedCurrentDate = Date()
         let expiredTimestamp = fixedCurrentDate.minusFeedCacheMaxAge().adding(seconds: -1)
@@ -68,6 +68,25 @@ class ValidateFeedCacheUseCaseTests: XCTestCase {
         store.completeRetrieval(with: feed.local, timestamp: expiredTimestamp)
         
         XCTAssertEqual(store.receivedMessages, [.retrieve, .deleteCacheFeed])
+    }
+    
+    func test_validateCache_failsOnDeletionErrorOfFailedRetrieval() {
+        let (sut, store) = makeSUT()
+        let deletionError = anyNSError()
+        
+        expect(sut, toCompleteWith: .failure(deletionError), when: {
+            store.completeRetrieval(with: anyNSError())
+            store.completeDeletion(with: deletionError)
+        })
+    }
+    
+    func test_validateCache_succeedsOnSuccessfulDeletionOfFailedRetrieval() {
+        let (sut, store) = makeSUT()
+        
+        expect(sut, toCompleteWith: .success(()), when: {
+            store.completeRetrieval(with: anyNSError())
+            store.completeDeletionSuccessfully()
+        })
     }
     
     func test_validateCache_doesNotDeleteCacheAfterSUTInstanceHasBeenDeallocated() {
@@ -82,7 +101,6 @@ class ValidateFeedCacheUseCaseTests: XCTestCase {
         XCTAssertEqual(store.receivedMessages, [.retrieve])
     }
     
-    
     // MARK: - Helpers
     
     private func makeSUT(currentDate: @escaping () -> Date = Date.init, file: StaticString = #filePath, line: UInt = #line) -> (sut: LocalFeedLoader, store: FeedStoreSpy) {
@@ -91,6 +109,28 @@ class ValidateFeedCacheUseCaseTests: XCTestCase {
         trackForMemoryLeaks(store, file: file, line: line)
         trackForMemoryLeaks(sut, file: file, line: line)
         return (sut, store)
+    }
+    
+    private func expect(_ sut: LocalFeedLoader, toCompleteWith expectedResult: LocalFeedLoader.ValidationResult, when action: () -> Void, file: StaticString = #file, line: UInt = #line) {
+        let exp = expectation(description: "Wait for load completion")
+        
+        sut.validateCache { receivedResult in
+            switch (receivedResult, expectedResult) {
+            case (.success, .success):
+                break
+                
+            case let (.failure(receivedError as NSError), .failure(expectedError as NSError)):
+                XCTAssertEqual(receivedError, expectedError, file: file, line: line)
+                
+            default:
+                XCTFail("Expected result \(expectedResult), got \(receivedResult) instead", file: file, line: line)
+            }
+            
+            exp.fulfill()
+        }
+        
+        action()
+        wait(for: [exp], timeout: 1.0)
     }
     
 }
