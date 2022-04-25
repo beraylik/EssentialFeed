@@ -50,16 +50,6 @@
                ReferencedContainer = "container:EssentialApp.xcodeproj">
             </BuildableReference>
          </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E5139992280C63E800F2589C"
-               BuildableName = "EssentialAppUITests.xctest"
-               BlueprintName = "EssentialAppUITests"
-               ReferencedContainer = "container:EssentialApp.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
