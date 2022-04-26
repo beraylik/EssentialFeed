@@ -62,6 +62,28 @@ class FeedImageDataLoaderCacheDecoratorTests: XCTestCase {
         wait(for: [exp], timeout: 1)
     }
     
+    func test_loadImageData_deliversErrorDataOnLoaderFailure() {
+        let url = anyURL()
+        let loader = LoaderSpy()
+        let sut = FeedImageDataLoaderCacheDecorator(decoratee: loader)
+        
+        let exp = expectation(description: "Wait for loading")
+        _ = sut.loadImageData(from: url) { result in
+            switch result {
+            case .success:
+                XCTFail("Expected to receive error, got \(result) instead")
+                
+            case .failure:
+                break
+            }
+            exp.fulfill()
+        }
+        
+        loader.complete(with: anyNSError())
+        
+        wait(for: [exp], timeout: 1)
+    }
+    
     // MARK: - Helpers
     
     private class LoaderSpy: FeedImageDataLoader {
@@ -82,6 +104,10 @@ class FeedImageDataLoaderCacheDecoratorTests: XCTestCase {
         
         func complete(with data: Data, at index: Int = 0) {
             messages[index].completion(.success(data))
+        }
+        
+        func complete(with error: Error, at index: Int = 0) {
+            messages[index].completion(.failure(error))
         }
     }
     
