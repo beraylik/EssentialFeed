@@ -48,11 +48,11 @@ class FeedImageDataLoaderCacheDecoratorTests: XCTestCase {
     }
     
     func test_loadImageData_deliversImageDataOnLoaderSuccess() {
-        let data = anyData()
+        let imageData = anyData()
         let (sut, loader) = makeSUT()
         
-        expect(sut, toCompleteWith: .success(data), when: {
-            loader.complete(with: data)
+        expect(sut, toCompleteWith: .success(imageData), when: {
+            loader.complete(with: imageData)
         })
     }
     
