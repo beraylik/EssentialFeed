@@ -23,16 +23,14 @@ final class FeedImageDataLoaderCacheDecorator: FeedImageDataLoader {
 class FeedImageDataLoaderCacheDecoratorTests: XCTestCase {
     
     func test_init_doesNotLoadImageData() {
-        let loader = LoaderSpy()
-        let _ = FeedImageDataLoaderCacheDecorator(decoratee: loader)
+        let (_, loader) = makeSUT()
         
         XCTAssertTrue(loader.loadedURLs.isEmpty, "Expected no loaded URLs")
     }
     
     func test_loadImageData_loadsFromloader() {
         let url = anyURL()
-        let loader = LoaderSpy()
-        let sut = FeedImageDataLoaderCacheDecorator(decoratee: loader)
+        let (sut, loader) = makeSUT()
         
         _ = sut.loadImageData(from: url) { _ in }
         
@@ -42,8 +40,7 @@ class FeedImageDataLoaderCacheDecoratorTests: XCTestCase {
     func test_loadImageData_deliversImageDataOnLoaderSuccess() {
         let url = anyURL()
         let data = anyData()
-        let loader = LoaderSpy()
-        let sut = FeedImageDataLoaderCacheDecorator(decoratee: loader)
+        let (sut, loader) = makeSUT()
         
         let exp = expectation(description: "Wait for loading")
         _ = sut.loadImageData(from: url) { result in
@@ -64,8 +61,7 @@ class FeedImageDataLoaderCacheDecoratorTests: XCTestCase {
     
     func test_loadImageData_deliversErrorDataOnLoaderFailure() {
         let url = anyURL()
-        let loader = LoaderSpy()
-        let sut = FeedImageDataLoaderCacheDecorator(decoratee: loader)
+        let (sut, loader) = makeSUT()
         
         let exp = expectation(description: "Wait for loading")
         _ = sut.loadImageData(from: url) { result in
@@ -85,6 +81,14 @@ class FeedImageDataLoaderCacheDecoratorTests: XCTestCase {
     }
     
     // MARK: - Helpers
+    
+    private func makeSUT(file: StaticString = #file, line: UInt = #line) -> (sut: FeedImageDataLoader, loader: LoaderSpy) {
+        let loader = LoaderSpy()
+        let sut = FeedImageDataLoaderCacheDecorator(decoratee: loader)
+        trackForMemoryLeaks(loader, file: file, line: line)
+        trackForMemoryLeaks(sut, file: file, line: line)
+        return (sut, loader)
+    }
     
     private class LoaderSpy: FeedImageDataLoader {
         private var messages = [(url: URL, completion: (FeedImageDataLoader.Result) -> Void)]()
