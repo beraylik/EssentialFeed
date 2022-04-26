@@ -26,7 +26,7 @@ class FeedImageDataLoaderCacheDecoratorTests: XCTestCase {
         let loader = LoaderSpy()
         let _ = FeedImageDataLoaderCacheDecorator(decoratee: loader)
         
-        XCTAssertTrue(loader.loadedURLs.isEmpty)
+        XCTAssertTrue(loader.loadedURLs.isEmpty, "Expected no loaded URLs")
     }
     
     func test_loadImageData_loadsFromloader() {
@@ -36,7 +36,30 @@ class FeedImageDataLoaderCacheDecoratorTests: XCTestCase {
         
         _ = sut.loadImageData(from: url) { _ in }
         
-        XCTAssertEqual(loader.loadedURLs, [url])
+        XCTAssertEqual(loader.loadedURLs, [url], "Expected to load URL from loader")
+    }
+    
+    func test_loadImageData_deliversImageDataOnLoaderSuccess() {
+        let url = anyURL()
+        let data = anyData()
+        let loader = LoaderSpy()
+        let sut = FeedImageDataLoaderCacheDecorator(decoratee: loader)
+        
+        let exp = expectation(description: "Wait for loading")
+        _ = sut.loadImageData(from: url) { result in
+            switch result {
+            case .success(let receivedData):
+                XCTAssertEqual(receivedData, data)
+                
+            case .failure:
+                XCTFail("Expected to receive success data, got \(result) instead")
+            }
+            exp.fulfill()
+        }
+        
+        loader.complete(with: data)
+        
+        wait(for: [exp], timeout: 1)
     }
     
     // MARK: - Helpers
@@ -55,6 +78,10 @@ class FeedImageDataLoaderCacheDecoratorTests: XCTestCase {
         func loadImageData(from url: URL, completion: @escaping (FeedImageDataLoader.Result) -> Void) -> FeedImageDataLoaderTask {
             messages.append((url, completion))
             return Task()
+        }
+        
+        func complete(with data: Data, at index: Int = 0) {
+            messages[index].completion(.success(data))
         }
     }
     
