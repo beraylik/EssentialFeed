@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import CoreData
 import EssentialFeed
 import EssentialFeediOS
 
@@ -21,20 +20,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let remoteFeedLoader = RemoteFeedLoader(url: remoteUrl, client: remoteClient)
         let remoteImageLoader = RemoteFeedImageDataLoader(client: remoteClient)
         
-        let localStoreURL = NSPersistentContainer
-            .defaultDirectoryURL()
-            .appendingPathComponent("feed-store.sqlite")
-        let localStore = try! CoreDataFeedStore(storeURL: localStoreURL)
-        let localFeedLoader = LocalFeedLoader(store: localStore)
-        let localImageLoader = LocalFeedImageDataLoader(store: localStore)
-        
         window?.rootViewController = FeedUIComposer.feedComposedWith(
-            feedLoader: FeedLoaderWithFallbackComposite(
-                primary: remoteFeedLoader,
-                fallback: localFeedLoader),
-            imageLoader: FeedImageDataLoaderWithFallbackComposite(
-                primary: remoteImageLoader,
-                fallback: localImageLoader))
+            feedLoader: remoteFeedLoader,
+            imageLoader: remoteImageLoader)
     }
 }
 
