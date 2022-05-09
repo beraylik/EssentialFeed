@@ -191,11 +191,11 @@
 				E57D492B282979570008B16F /* Feed UI */,
 				E520E53728172C6D0065CE69 /* Helpers */,
 				E591D3A4282976A00030E7CD /* SceneDelegateTests.swift */,
+				E57D493928297BA10008B16F /* FeedAcceptanceTests.swift */,
 				E520E52F28171C220065CE69 /* FeedLoaderWithFallbackCompositeTests.swift */,
 				E520E533281722A60065CE69 /* FeedImageDataLoaderWithFallbackCompositeTests.swift */,
 				E5203C57281863290065CE69 /* FeedLoaderCacheDecoratorTests.swift */,
 				E5203C6128186C400065CE69 /* FeedImageDataLoaderCacheDecoratorTests.swift */,
-				E57D493928297BA10008B16F /* FeedAcceptanceTests.swift */,
 			);
 			path = EssentialAppTests;
 			sourceTree = "<group>";
