@@ -51,6 +51,7 @@
 		E591D3C5282978B60030E7CD /* UIButton+TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E591D3C0282978B60030E7CD /* UIButton+TestHelpers.swift */; };
 		E591D3C6282978B60030E7CD /* UIRefreshControl+TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E591D3BF282978B60030E7CD /* UIRefreshControl+TestHelpers.swift */; };
 		E591D3C7282978B60030E7CD /* UIImage+TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E591D3C2282978B60030E7CD /* UIImage+TestHelpers.swift */; };
+		E5D04967282A74E800F9824C /* UIView+TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5D04966282A74E800F9824C /* UIView+TestHelpers.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -124,6 +125,7 @@
 		E591D3C0282978B60030E7CD /* UIButton+TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+TestHelpers.swift"; sourceTree = "<group>"; };
 		E591D3C1282978B60030E7CD /* UIControl+TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIControl+TestHelpers.swift"; sourceTree = "<group>"; };
 		E591D3C2282978B60030E7CD /* UIImage+TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+TestHelpers.swift"; sourceTree = "<group>"; };
+		E5D04966282A74E800F9824C /* UIView+TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+TestHelpers.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -228,6 +230,7 @@
 				E5203C65281876FB0065CE69 /* XCTestCase+FeedImageDataLoader.swift */,
 				E57D493B282982E70008B16F /* HTTPClientStub.swift */,
 				E57D493D282983260008B16F /* InMemoryFeedStore.swift */,
+				E5D04966282A74E800F9824C /* UIView+TestHelpers.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -394,6 +397,7 @@
 				E5203C58281863290065CE69 /* FeedLoaderCacheDecoratorTests.swift in Sources */,
 				E57D493C282982E70008B16F /* HTTPClientStub.swift in Sources */,
 				E5203C64281876580065CE69 /* FeedImageDataLoaderSpy.swift in Sources */,
+				E5D04967282A74E800F9824C /* UIView+TestHelpers.swift in Sources */,
 				E520E534281722A60065CE69 /* FeedImageDataLoaderWithFallbackCompositeTests.swift in Sources */,
 				E520E53028171C220065CE69 /* FeedLoaderWithFallbackCompositeTests.swift in Sources */,
 				E57D493A28297BA10008B16F /* FeedAcceptanceTests.swift in Sources */,
