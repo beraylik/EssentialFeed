@@ -394,7 +394,6 @@
 		6F68A63927BA69DD0016F054 /* EssentialFeediOSTests */ = {
 			isa = PBXGroup;
 			children = (
-				6F68A66827BCD7F00016F054 /* Helpers */,
 			);
 			path = EssentialFeediOSTests;
 			sourceTree = "<group>";
@@ -404,13 +403,6 @@
 			children = (
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		6F68A66827BCD7F00016F054 /* Helpers */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Helpers;
 			sourceTree = "<group>";
 		};
 		6F68A67127BCD96F0016F054 /* Controllers */ = {
