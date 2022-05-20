@@ -7,6 +7,7 @@
 
 import Foundation
 import EssentialFeed
+import EssentialFeedCache
 
 func uniqueImageFeed() -> (models: [FeedImage], local: [LocalFeedImage]) {
     let models = [uniqueImage(), uniqueImage()]
@@ -17,7 +18,6 @@ func uniqueImageFeed() -> (models: [FeedImage], local: [LocalFeedImage]) {
 func uniqueImage() -> FeedImage {
     return FeedImage(id: UUID(), description: nil, location: nil, url: anyURL())
 }
-
 
 extension Date {
     private var feedMaxCacheAgeInDays: Int { return 7 }
