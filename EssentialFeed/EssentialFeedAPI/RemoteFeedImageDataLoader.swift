@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import EssentialFeed
 
 public final class RemoteFeedImageDataLoader: FeedImageDataLoader {
     
