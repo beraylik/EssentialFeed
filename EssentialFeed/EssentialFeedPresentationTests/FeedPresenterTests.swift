@@ -34,7 +34,7 @@ class FeedPresenterTests: XCTestCase {
     
     func test_didFinishLoadingFeed_displaysFeedAndStopsLoading() {
         let (sut, view) = makeSUT()
-        let feed = uniqueImageFeed().models
+        let feed = [uniqueImage(), uniqueImage()]
         
         sut.didFinishLoadingFeed(with: feed)
         
